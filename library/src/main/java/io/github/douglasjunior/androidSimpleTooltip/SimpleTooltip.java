@@ -82,6 +82,8 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
     private static final int mDefaultArrowWidthRes = R.dimen.simpletooltip_arrow_width;
     private static final int mDefaultArrowHeightRes = R.dimen.simpletooltip_arrow_height;
     private static final int mDefaultOverlayOffsetRes = R.dimen.simpletooltip_overlay_offset;
+    private static final int mDefaultXR = R.dimen.simpletooltip_overlay_offset;
+    private static final int mDefaultYR = R.dimen.simpletooltip_overlay_offset;
 
     private final Context mContext;
     private OnDismissListener mOnDismissListener;
@@ -100,6 +102,9 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
     private final View mAnchorView;
     private final boolean mTransparentOverlay;
     private final float mOverlayOffset;
+    private final float mXR;
+    private final float mYR;
+
     private final boolean mOverlayMatchParent;
     private final float mMaxWidth;
     private View mOverlay;
@@ -117,7 +122,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
     private final float mArrowHeight;
     private final boolean mFocusable;
     private boolean dismissed = false;
-    private int mHighlightShape = OverlayView.HIGHLIGHT_SHAPE_OVAL;
+    private int mHighlightShape = OverlayView.HIGHLIGHT_SHAPE_RECTANGULAR_ROUND;
 
 
     private SimpleTooltip(Builder builder) {
@@ -133,6 +138,8 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
         mAnchorView = builder.anchorView;
         mTransparentOverlay = builder.transparentOverlay;
         mOverlayOffset = builder.overlayOffset;
+        mXR = builder.xR;
+        mYR = builder.yR;
         mOverlayMatchParent = builder.overlayMatchParent;
         mMaxWidth = builder.maxWidth;
         mShowArrow = builder.showArrow;
@@ -213,7 +220,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
     }
 
     private void createOverlay() {
-        mOverlay = mTransparentOverlay ? new View(mContext) : new OverlayView(mContext, mAnchorView, mHighlightShape, mOverlayOffset);
+        mOverlay = mTransparentOverlay ? new View(mContext) : new OverlayView(mContext, mAnchorView, mHighlightShape, mOverlayOffset, mXR, mYR);
         if (mOverlayMatchParent)
             mOverlay.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         else
@@ -543,6 +550,8 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
         private int gravity = Gravity.BOTTOM;
         private boolean transparentOverlay = true;
         private float overlayOffset = -1;
+        private float xR = -1;
+        private float yR = -1;
         private boolean overlayMatchParent = true;
         private float maxWidth;
         private boolean showArrow = true;
@@ -560,7 +569,7 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
         private float arrowHeight;
         private float arrowWidth;
         private boolean focusable;
-        private int highlightShape = OverlayView.HIGHLIGHT_SHAPE_OVAL;
+        private int highlightShape = OverlayView.HIGHLIGHT_SHAPE_RECTANGULAR_ROUND;
 
         public Builder(Context context) {
             this.context = context;
@@ -609,11 +618,17 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
                 if (arrowHeight == 0)
                     arrowHeight = context.getResources().getDimension(mDefaultArrowHeightRes);
             }
-            if (highlightShape < 0 || highlightShape > OverlayView.HIGHLIGHT_SHAPE_RECTANGULAR) {
+            if (highlightShape < 0) {
                 highlightShape = OverlayView.HIGHLIGHT_SHAPE_OVAL;
             }
             if (overlayOffset < 0) {
                 overlayOffset = context.getResources().getDimension(mDefaultOverlayOffsetRes);
+            }
+            if (xR < 0) {
+                xR = contentView.getResources().getDimension(mDefaultXR);
+            }
+            if (yR < 0) {
+                yR = contentView.getResources().getDimension(mDefaultYR);
             }
             return new SimpleTooltip(this);
         }
@@ -1048,6 +1063,16 @@ public class SimpleTooltip implements PopupWindow.OnDismissListener {
          */
         public Builder overlayOffset(@Dimension float overlayOffset) {
             this.overlayOffset = overlayOffset;
+            return this;
+        }
+
+        public Builder xR(@Dimension float xR) {
+            this.xR = xR;
+            return this;
+        }
+
+        public Builder yR(@Dimension float yR) {
+            this.yR = yR;
             return this;
         }
 
